@@ -6,6 +6,8 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 
+import java.util.List;
+
 /**
  * Created by emanuelteixeira on 02/03/15.
  */
@@ -16,6 +18,7 @@ public class GPSManager implements LocationListener{
     boolean wifiEnabled = false;
 
     private String provider;
+    private List<String> listProvider;
 
     public LocationManager getLocationManager() {
         return locationManager;
@@ -87,16 +90,21 @@ public class GPSManager implements LocationListener{
     }
 
     public void updates(){
-        getLocationManager().requestLocationUpdates(LocationManager.GPS_PROVIDER, 400, 1, this);
-        getLocationManager().requestLocationUpdates(LocationManager.NETWORK_PROVIDER, 400, 1, this);
+        for (String p : this.listProvider)
+        {
+            getLocationManager().requestLocationUpdates(p, 400, 1, this);
+        }
     }
 
     public void run() {
         Criteria criteria = new Criteria();
+        this.listProvider = locationManager.getAllProviders();
         this.provider = locationManager.getBestProvider(criteria, false);
         Location location = locationManager.getLastKnownLocation(provider);
-        this.setMY_LAT(location.getLatitude());
-        this.setMY_LNG(location.getLongitude());
+        if (location != null){
+            this.setMY_LAT(location.getLatitude());
+            this.setMY_LNG(location.getLongitude());
+        }
         updates();
     }
 }
