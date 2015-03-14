@@ -3,5 +3,5 @@
     <item android:id="@+id/like_action"
         android:icon="@drawable/ic_like_default"
         android:title="Like"
-        app:showAsAction="always"  />
+        app:showAsAction="always"/>
 </menu>

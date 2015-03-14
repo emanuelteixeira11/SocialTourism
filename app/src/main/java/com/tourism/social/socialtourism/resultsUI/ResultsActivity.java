@@ -4,7 +4,7 @@ import android.app.AlertDialog;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.ActionBarActivity;
-import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -21,12 +21,17 @@ import com.tourism.social.socialtourism.utils.UI.WaitAlertDialog;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+
 
 public class ResultsActivity extends ActionBarActivity {
 
     private FloatingActionButton fab;
     private RecyclerView recList;
     private ListPlaces places;
+    private ArrayList<Place> listPlaces;
     private ItemAdapter itemAdapter;
 
     @Override
@@ -36,15 +41,42 @@ public class ResultsActivity extends ActionBarActivity {
         this.places = (ListPlaces) getIntent().getExtras().get("places");
         this.recList = (RecyclerView) findViewById(R.id.cardList);
         recList.setHasFixedSize(true);
-        final LinearLayoutManager llm = new LinearLayoutManager(this);
-        llm.setOrientation(LinearLayoutManager.VERTICAL);
+        final GridLayoutManager llm = new GridLayoutManager(this, BIND_AUTO_CREATE);
+        llm.setOrientation(GridLayoutManager.VERTICAL);
         this.recList.setLayoutManager(llm);
         this.itemAdapter = new ItemAdapter(places);
         recList.setAdapter(itemAdapter);
 
         this.fab = (FloatingActionButton) findViewById(R.id.fab);
-
         fab.attachToRecyclerView(recList);
+
+        if (places.getNextPageToken().equals(""))
+        {
+            this.fab.setVisibility(View.INVISIBLE);
+        }
+
+        recList.setOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(RecyclerView recyclerView, int newState) {
+                GridLayoutManager layoutManager = ((GridLayoutManager)recyclerView.getLayoutManager());
+                int firstVisiblePosition = layoutManager.findFirstVisibleItemPosition();
+                if (layoutManager.findLastVisibleItemPosition() == places.getPlaces().size()){
+                    fab.show();
+                }
+            }
+
+            @Override
+            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
+                GridLayoutManager layoutManager = ((GridLayoutManager)recyclerView.getLayoutManager());
+                if (dy < 0 ||
+                        layoutManager.findLastVisibleItemPosition() >= places.getPlaces().size() - 1)
+                {
+                    fab.show();
+                }
+                else
+                    fab.hide();
+            }
+        });
 
         this.fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -63,7 +95,7 @@ public class ResultsActivity extends ActionBarActivity {
                             {
                                 ListPlaces newListPlace = new ListPlaces();
                                 newListPlace.setNewPlacesList(jsonObject, ResultsActivity.this.places.getMyLat(),
-                                        ResultsActivity.this.places.getMyLat());
+                                        ResultsActivity.this.places.getMyLng());
                                 ResultsActivity.this.places.getPlaces().addAll(newListPlace.getPlaces());
                                 ResultsActivity.this.places.setNextPageToken(newListPlace.getNextPageToken());
                                 ResultsActivity.this.itemAdapter.addAll(newListPlace);
@@ -71,13 +103,7 @@ public class ResultsActivity extends ActionBarActivity {
                                 alertDialog.dismiss();
                                 if (newListPlace.getNextPageToken().equals(""))
                                 {
-                                    ResultsActivity.this.recList.setOnScrollListener(new RecyclerView.OnScrollListener() {
-                                        @Override
-                                        public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                                            fab.hide();
-                                        }
-                                    });
-                                    fab.hide(false);
+                                    fab.setVisibility(View.INVISIBLE);
                                 }
                             }
                         } catch (JSONException e) {
@@ -122,6 +148,62 @@ public class ResultsActivity extends ActionBarActivity {
         // as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
         if (id == R.id.action_settings) {
+            return true;
+        }
+        else if(id == android.R.id.home)
+        {
+            Intent returnIntent = new Intent();
+            setResult(RESULT_OK, returnIntent);
+            finish();
+            return true;
+        }
+        else if (id== R.id.order_by_ranking)
+        {
+            Collections.sort(this.places.getPlaces(), new Comparator<Place>() {
+                @Override
+                public int compare(Place place, Place place2) {
+                    if (place.getRating() > place2.getRating())
+                    {
+                        return -1;
+                    }
+                    else if (place.getRating() < place2.getRating()){
+                        return 1;
+                    }
+                    else {
+                        return 0;
+                    }
+                }
+            });
+            this.itemAdapter.notifyDataSetChanged();
+            return true;
+        }
+        else if (id == R.id.order_by_distance)
+        {
+            Collections.sort(this.places.getPlaces());
+            this.itemAdapter.notifyDataSetChanged();
+            return true;
+        }
+        else if (id == R.id.show_opened)
+        {
+            item.setChecked(!item.isChecked());
+            if (item.isChecked())
+            {
+                ArrayList<Place> temp = new ArrayList<Place>();
+                for (Place place : places.getPlaces())
+                {
+                    if (!place.isOpnenNow())
+                    {
+                        temp.add(place);
+                    }
+                }
+                listPlaces = new ArrayList<Place>(places.getPlaces());
+                places.getPlaces().removeAll(temp);
+            }
+            else {
+                places.getPlaces().clear();
+                places.getPlaces().addAll(listPlaces);
+            }
+            this.itemAdapter.notifyDataSetChanged();
             return true;
         }
         return super.onOptionsItemSelected(item);

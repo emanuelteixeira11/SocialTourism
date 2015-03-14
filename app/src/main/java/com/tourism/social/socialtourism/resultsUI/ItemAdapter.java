@@ -13,6 +13,7 @@ import android.widget.TextView;
 import com.tourism.social.socialtourism.R;
 import com.tourism.social.socialtourism.utils.AsynkTasks.GooglePaclesApiRequest;
 import com.tourism.social.socialtourism.utils.Place.GooglePlacesUrlEncoder;
+import com.tourism.social.socialtourism.utils.Place.GoogleTypes;
 import com.tourism.social.socialtourism.utils.Place.ListPlaces;
 import com.tourism.social.socialtourism.utils.Place.Place;
 import com.tourism.social.socialtourism.utils.UI.WaitAlertDialog;
@@ -85,6 +86,22 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
         if (place.getPriceLevel() == 1){
             itemViewHolder.price3.setImageResource(R.drawable.ic_dollar);
         }
+
+        if (place.getTypes().contains(GoogleTypes.LODGING)){
+            itemViewHolder.icon.setImageResource(R.drawable.ic_hotel);
+        }
+        else if (place.getTypes().contains(GoogleTypes.RESTAURANT)){
+            itemViewHolder.icon.setImageResource(R.drawable.ic_restaurant);
+        }
+        else if (place.getTypes().contains(GoogleTypes.NIGHT_CLUB)){
+            itemViewHolder.icon.setImageResource(R.drawable.ic_beer);
+        }
+        else if (place.getTypes().contains(GoogleTypes.BAR) || place.getTypes().contains(GoogleTypes.CAFE)){
+            itemViewHolder.icon.setImageResource(R.drawable.ic_bar);
+        }
+        else if (place.getTypes().contains(GoogleTypes.ART_GALLERY)){
+            itemViewHolder.icon.setImageResource(R.drawable.ic_art_gallery);
+        }
     }
 
     @Override
@@ -94,6 +111,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
 
     public static class ItemViewHolder extends RecyclerView.ViewHolder {
         protected final String[] openNowArray;
+        protected ImageView icon;
         protected TextView title;
         protected TextView address;
         protected String reference;
@@ -117,7 +135,7 @@ public class ItemAdapter extends RecyclerView.Adapter<ItemAdapter.ItemViewHolder
             ratingView = (TextView) v.findViewById(R.id.rating);
             openNow = (TextView) v.findViewById(R.id.open_now);
             clock = (ImageView) v.findViewById(R.id.clock_view);
-
+            icon = (ImageView) v.findViewById(R.id.iconView);
             price1 = (ImageView) v.findViewById(R.id.priceIcon1);
             price2 = (ImageView) v.findViewById(R.id.priceIcon2);
             price3 = (ImageView) v.findViewById(R.id.priceIcon3);

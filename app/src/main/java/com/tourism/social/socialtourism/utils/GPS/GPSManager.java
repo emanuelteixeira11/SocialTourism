@@ -66,11 +66,19 @@ public class GPSManager implements LocationListener{
 
     @Override
     public void onProviderEnabled(String s) {
+        if (s.equals("gps"))
+            gpsEnabled = true;
+        else if (s.equals("network"))
+            wifiEnabled = true;
         run();
     }
 
     @Override
     public void onProviderDisabled(String s) {
+        if (s.equals("gps"))
+            gpsEnabled = false;
+        else if (s.equals("network"))
+            wifiEnabled = false;
         run();
     }
 

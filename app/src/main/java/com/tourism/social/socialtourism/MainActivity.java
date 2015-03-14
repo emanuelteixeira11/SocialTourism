@@ -13,7 +13,6 @@ import android.view.View;
 
 import com.tourism.social.socialtourism.resultsUI.ResultsActivity;
 import com.tourism.social.socialtourism.utils.Place.ListPlaces;
-import com.tourism.social.socialtourism.utils.UI.WaitAlertDialog;
 
 
 public class MainActivity extends ActionBarActivity {
@@ -39,47 +38,7 @@ public class MainActivity extends ActionBarActivity {
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setHomeAsUpIndicator(R.drawable.ic_hamburguer);
-        WaitAlertDialog waitAlertDialog = new WaitAlertDialog(this);
 
-        /*final HashMap<String, String> map = new HashMap<String, String>();
-        map.put("radius", "500");
-
-        this.gpsManager = new GPSManager((LocationManager) getSystemService(LOCATION_SERVICE)){
-            @Override
-            public void onLocationChanged(Location location) {
-                map.put("lat", location.getLatitude() + "");
-                map.put("lng", location.getLongitude() + "");
-            }
-        };
-        this.gpsManager.run();
-
-        map.put("lat", gpsManager.getMY_LAT() + "");
-        map.put("lng", gpsManager.getMY_LNG() + "");
-
-        final AlertDialog dialog = waitAlertDialog.getAlertDialog();
-        dialog.show();
-        String url = GooglePlacesUrlEncoder.getUrlEncoded(map, new GoogleTypes[]{GoogleTypes.RESTAURANT, GoogleTypes.ESTABLISHMENT});
-        this.listPlaces = new ListPlaces();
-        new GooglePaclesApiRequest(){
-            @Override
-            protected void onPostExecute(JSONObject jsonObject) {
-                super.onPostExecute(jsonObject);
-                try {
-                    if (jsonObject.getString("status").equals("OK"))
-                    {
-                        dialog.dismiss();
-                        listPlaces = new ListPlaces();
-                        listPlaces.setNewPlacesList(jsonObject, Double.parseDouble(map.get("lat")),
-                                Double.parseDouble(map.get("lng")));
-                    }
-                    else {
-                        Toast.makeText(getBaseContext(), "NAO", Toast.LENGTH_LONG).show();
-                    }
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        }.execute(url);*/
 
         //ContactsList list = new ContactsList(getContentResolver());
         //list.readContacts();
@@ -127,7 +86,7 @@ public class MainActivity extends ActionBarActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    private boolean isOnline() {
+    public boolean isOnline() {
         ConnectivityManager cm = (ConnectivityManager) getSystemService(
                 Context.CONNECTIVITY_SERVICE);
         NetworkInfo netInfo = cm.getActiveNetworkInfo();

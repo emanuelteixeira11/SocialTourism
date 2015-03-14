@@ -21,4 +21,23 @@
     <string name="get_coordinates">Get My Coordinates</string>
     <string name="address_input">Address or Key words</string>
 
+    <string name="get_info_from_coordinates">Search Places</string>
+    <string name="get_info_from_address">Search places from address or key words</string>
+    <string name="radius_label">Radius: </string>
+
+    <array name="google_types">
+        <item>Restaurant</item>
+        <item>Art Gallery</item>
+        <item>Bar</item>
+        <item>Cafe</item>
+        <item>Establishment</item>
+        <item>Food</item>
+        <item>Airport</item>
+        <item>Museum</item>
+        <item>Night Club</item>
+        <item>Hotel</item>
+    </array>
+    
+    <string name="least_type">Choice at least one type!</string>
+    <string name="order_by_ranking">Order by rating</string>
 </resources>

@@ -1,8 +1,17 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.tourism.social.socialtourism.resultsUI.ResultsActivity" >
-    <item android:id="@+id/action_settings"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item android:id="@+id/filter_ranking"
+        android:icon="@drawable/ic_filter"
         android:title="@string/action_settings"
-        android:orderInCategory="100"
-        android:showAsAction="never" />
+        app:showAsAction="always">
+        <menu>
+            <item android:title="Order by distance"
+                android:id="@+id/order_by_distance"/>
+            <item android:title="@string/order_by_ranking"
+                android:id="@+id/order_by_ranking"/>
+            <item android:title="Show places open now"
+                android:id="@+id/show_opened"
+                android:checkable="true"/>
+        </menu>
+    </item>
 </menu>

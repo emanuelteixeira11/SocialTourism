@@ -58,10 +58,12 @@ public class DetailsActivity extends ActionBarActivity {
         typeDetails.setText("");
         for (int i = 0; i < place.getTypes().size(); i++) {
             if (i + 1 < place.getTypes().size()){
-                typeDetails.setText(typeDetails.getText() + place.getTypes().get(i).getGoogleType() + " | ");
+                typeDetails.setText(typeDetails.getText() +
+                        getResources().getStringArray(R.array.google_types)[place.getTypes().get(i).getCode()] + " | ");
             }
             else
-                typeDetails.setText(typeDetails.getText() + place.getTypes().get(i).getGoogleType() + "");
+                typeDetails.setText(typeDetails.getText() +
+                        getResources().getStringArray(R.array.google_types)[place.getTypes().get(i).getCode()] + "");
         }
 
 
@@ -163,7 +165,6 @@ public class DetailsActivity extends ActionBarActivity {
         int id = item.getItemId();
         if (id == android.R.id.home)
         {
-
             Intent returnIntent = new Intent();
             returnIntent.putExtra("placeResult", this.place);
             setResult(RESULT_OK, returnIntent);

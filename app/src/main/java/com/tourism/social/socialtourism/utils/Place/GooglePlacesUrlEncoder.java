@@ -24,9 +24,14 @@ public class GooglePlacesUrlEncoder {
         urlBase.append(params.get("lat"));
         urlBase.append(",");
         urlBase.append(params.get("lng"));
-        urlBase.append("&radius=");
-        int radius = (params.containsKey("radius")) ? Integer.parseInt(params.get("radius")) : 5000;
-        urlBase.append(radius);
+        if (params.containsKey("radius"))
+        {
+            urlBase.append("&radius=");
+            urlBase.append(params.get("radius"));
+        }
+        else {
+            urlBase.append("&rankby=distance");
+        }
         if (types != null)
         {
             urlBase.append("&types=");
@@ -76,9 +81,13 @@ public class GooglePlacesUrlEncoder {
     {
         StringBuilder urlBase = new StringBuilder(GOOGLE_API_TEXT_SEARCH.toString());
         urlBase.append("query=");
-        urlBase.append(query);
+        try {
+            urlBase.append(URLEncoder.encode(query, "UTF-8").replace("+", "%20"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
         urlBase.append("&sensor=true");
-        if (typeses != null){
+        if (typeses.length > 0){
             urlBase.append("&types=");
             urlBase.append(getTypesEncoded(typeses));
         }

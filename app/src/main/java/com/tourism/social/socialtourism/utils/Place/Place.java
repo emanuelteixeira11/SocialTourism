@@ -27,6 +27,15 @@ public class Place implements Comparable<Place>, Serializable {
     private String website;
     private ArrayList<Review> listReviews;
     private boolean hasPhotos;
+    private boolean visible = true;
+
+    public boolean isVisible() {
+        return visible;
+    }
+
+    public void setVisible(boolean visible) {
+        this.visible = visible;
+    }
 
     public boolean hasPhotos() {
         return hasPhotos;
@@ -52,11 +61,11 @@ public class Place implements Comparable<Place>, Serializable {
         try {
             listReviews = new ArrayList<Review>();
             types = new ArrayList<GoogleTypes>();
-
             lat = local.getJSONObject("geometry").getJSONObject("location").getDouble("lat");
             lng = local.getJSONObject("geometry").getJSONObject("location").getDouble("lng");
-            if (local.has("rating"))
+            if (local.has("rating")){
                 rating = local.getDouble("rating");
+            }
             id = local.getString("id");
             name = local.getString("name");
             reference = local.getString("reference");
@@ -64,12 +73,10 @@ public class Place implements Comparable<Place>, Serializable {
                 opnenNow = local.getJSONObject("opening_hours").getBoolean("open_now");
             if (local.has("price_level"))
                 priceLevel = local.getInt("price_level");
-            if (local.has("formatted_adress"))
-                adress = local.getString("formatted_adress");
-            else if (local.has("vicinity"))
-                adress = local.getString("vicinity");
+            if (local.has("formatted_address"))
+                adress = local.getString("formatted_address");
             else
-                adress = null;
+                adress = local.getString("vicinity");
             JSONArray typesArray = local.getJSONArray("types");
             for (int i = 0; i < typesArray.length(); i++) {
                 try {
