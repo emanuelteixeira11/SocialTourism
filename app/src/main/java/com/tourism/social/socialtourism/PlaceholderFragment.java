@@ -232,14 +232,6 @@ public class PlaceholderFragment extends Fragment {
                 }
             }
         });
-        /*
-        searchByText.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                String url = GooglePlacesUrlEncoder.getTextSearchUrlEncoded(text_input.getText().toString(), null);
-                PlaceholderFragment.this.executeTask(url);
-            }
-        });*/
 
         getCoordinates.setOnClickListener(new View.OnClickListener() {
             @Override
