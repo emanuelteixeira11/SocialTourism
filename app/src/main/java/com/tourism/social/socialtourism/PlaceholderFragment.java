@@ -5,8 +5,8 @@ import android.app.Fragment;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.location.Location;
-import android.location.LocationManager;
 import android.os.Bundle;
+import android.provider.Settings;
 import android.text.Editable;
 import android.text.TextWatcher;
 import android.view.LayoutInflater;
@@ -22,7 +22,7 @@ import com.appyvet.rangebar.RangeBar;
 import com.rengwuxian.materialedittext.MaterialEditText;
 import com.tourism.social.socialtourism.resultsUI.ResultsActivity;
 import com.tourism.social.socialtourism.utils.AsynkTasks.GooglePaclesApiRequest;
-import com.tourism.social.socialtourism.utils.GPS.GPSManager;
+import com.tourism.social.socialtourism.utils.GPS.LocationListener;
 import com.tourism.social.socialtourism.utils.Place.GooglePlacesUrlEncoder;
 import com.tourism.social.socialtourism.utils.Place.GoogleTypes;
 import com.tourism.social.socialtourism.utils.Place.ListPlaces;
@@ -40,7 +40,6 @@ import info.hoang8f.widget.FButton;
  * Created by emanuelteixeira on 04/03/15.
  */
 public class PlaceholderFragment extends Fragment {
-    private GPSManager gpsManager;
     private boolean getCoordinatesIsPressed;
     private HashMap<CheckBox, GoogleTypes> checkBoxGoogleTypesHashMap;
     private MaterialEditText latitudeTextView;
@@ -49,6 +48,7 @@ public class PlaceholderFragment extends Fragment {
     private FButton searchPlace;
     private FButton getCoordinates;
     private RangeBar radiusRangeBar;
+    private LocationListener locationListener;
 
     public PlaceholderFragment() {
         getCoordinatesIsPressed = false;
@@ -157,7 +157,16 @@ public class PlaceholderFragment extends Fragment {
             public void afterTextChanged(Editable editable) {}
         });
 
-        this.gpsManager = new GPSManager((LocationManager) getActivity().getSystemService(getActivity().LOCATION_SERVICE))
+        this.locationListener = new LocationListener(this.getActivity()){
+            @Override
+            public void onLocationChanged(Location location) {
+                locationListener.setLocation(location);
+                latitudeTextView.setText(location.getLatitude() + "");
+                longitudeTextView.setText(location.getLongitude() + "");
+            }
+        };
+
+        /*this.gpsManager = new GPSManager((LocationManager) getActivity().getSystemService(getActivity().LOCATION_SERVICE))
         {
             @Override
             public void onLocationChanged(Location location) {
@@ -170,7 +179,7 @@ public class PlaceholderFragment extends Fragment {
                 }
             }
         };
-        this.gpsManager.run();
+        this.gpsManager.run();*/
 
         searchPlace.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -200,7 +209,7 @@ public class PlaceholderFragment extends Fragment {
 
                 MainActivity mainActivity = (MainActivity) getActivity();
                 if (!mainActivity.isOnline()){
-                    startActivityForResult(new Intent(android.provider.Settings.ACTION_SOUND_SETTINGS), 1023);
+                    startActivityForResult(new Intent(Settings.ACTION_SETTINGS), 1023);
                 }
                 else {
                     final HashMap<String, String> params = new HashMap<String, String>();
@@ -224,8 +233,8 @@ public class PlaceholderFragment extends Fragment {
                             Integer radius = Integer.parseInt(radiusLabel.getText().toString().split(": ")[1].split("km")[0]);
                             params.put("radius", (radius * 1000) + "");
                         }
-                        params.put("lat", gpsManager.getMY_LAT() + "");
-                        params.put("lng", gpsManager.getMY_LNG() + "");
+                        params.put("lat", locationListener.getLocation().getLatitude() + "");
+                        params.put("lng", locationListener.getLocation().getLongitude() + "");
                         url = GooglePlacesUrlEncoder.getUrlEncoded(params, googleTypes);
                     }
                     PlaceholderFragment.this.executeTask(url);
@@ -233,12 +242,13 @@ public class PlaceholderFragment extends Fragment {
             }
         });
 
+
         getCoordinates.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 getCoordinatesIsPressed = !getCoordinatesIsPressed;
                 if (getCoordinatesIsPressed) {
-                    if (!gpsManager.isGpsEnabled())
+                    /*if (!gpsManager.isGpsEnabled())
                     {
                         AlertDialog.Builder enableGpsDialog = new AlertDialog.Builder(getActivity());
                         enableGpsDialog.setMessage("Para melhorar a experiência ligue o GPS");
@@ -256,17 +266,16 @@ public class PlaceholderFragment extends Fragment {
                         });
                         enableGpsDialog.create();
                         enableGpsDialog.show();
-                    }
-
-                    latitudeTextView.setText(gpsManager.getMY_LAT() + "");
-                    longitudeTextView.setText(gpsManager.getMY_LNG() + "");
-                    gpsManager.updates();
+                    }*/
+                    latitudeTextView.setText(locationListener.getLocation().getLatitude() + "");
+                    longitudeTextView.setText(locationListener.getLocation().getLongitude() + "");
+                    locationListener.update(true);
                     getCoordinates.setButtonColor(getActivity().getResources().getColor(R.color.greenDark));
                     latitudeTextView.setEnabled(false);
                     longitudeTextView.setEnabled(false);
                 }
                 else {
-                    gpsManager.getLocationManager().removeUpdates(gpsManager);
+                    locationListener.update(false);
                     getCoordinates.setButtonColor(getActivity().getResources().getColor(R.color.Primary));
                     latitudeTextView.setEnabled(true);
                     longitudeTextView.setEnabled(true);
@@ -288,7 +297,8 @@ public class PlaceholderFragment extends Fragment {
                     if (jsonObject.getString("status").equals("OK"))
                     {
                         listPlaces[0] = new ListPlaces();
-                        listPlaces[0].setNewPlacesList(jsonObject, gpsManager.getMY_LAT(), gpsManager.getMY_LNG());
+                        listPlaces[0].setNewPlacesList(jsonObject, locationListener.getLocation().getLatitude(),
+                                locationListener.getLocation().getLongitude());
                         Intent i = new Intent(getActivity().getApplicationContext(), ResultsActivity.class);
                         i.putExtra("places", listPlaces[0]);
                         waitAlertDialog.dismiss();

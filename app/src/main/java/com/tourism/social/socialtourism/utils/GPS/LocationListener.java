@@ -19,14 +19,13 @@ public class LocationListener implements GoogleApiClient.ConnectionCallbacks, Go
     private LocationRequest mLocationRequest;
     final static int INTERVAL = 1000;
     final static int FASTEST_INTERVAL = 2000;
-    private Location lastLocation;
+    private Location location;
 
     public LocationListener(Activity activity) {
         this.activity = activity;
         this.buildGoogleApiClient();
-        //this.createLocationRequest();
         this.mGoogleApiClient.connect();
-
+        this.createLocationRequest();
     }
 
     public void createLocationRequest() {
@@ -34,6 +33,15 @@ public class LocationListener implements GoogleApiClient.ConnectionCallbacks, Go
         this.mLocationRequest.setInterval(INTERVAL);
         this.mLocationRequest.setFastestInterval(FASTEST_INTERVAL);
         this.mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+    }
+
+    public void update(boolean flag){
+        if (flag)
+            LocationServices.FusedLocationApi.requestLocationUpdates(
+                    mGoogleApiClient, mLocationRequest, this);
+        else
+            LocationServices.FusedLocationApi.removeLocationUpdates(
+                    mGoogleApiClient, this);
     }
 
     protected synchronized void buildGoogleApiClient() {
@@ -48,12 +56,7 @@ public class LocationListener implements GoogleApiClient.ConnectionCallbacks, Go
     public void onConnected(Bundle bundle) {
         Location mLastLocation = LocationServices.FusedLocationApi.getLastLocation(
                 mGoogleApiClient);
-        if (mLastLocation != null) {
-            Toast.makeText(this.activity.getBaseContext(), mLastLocation.getLatitude() + "", Toast.LENGTH_LONG).show();
-        }
-        LocationServices.FusedLocationApi.requestLocationUpdates(
-                mGoogleApiClient, mLocationRequest, this);
-        this.lastLocation = LocationServices.FusedLocationApi.getLastLocation(this.mGoogleApiClient);
+        this.location = LocationServices.FusedLocationApi.getLastLocation(this.mGoogleApiClient);
     }
 
     @Override
@@ -73,7 +76,11 @@ public class LocationListener implements GoogleApiClient.ConnectionCallbacks, Go
     @Override
     public void onLocationChanged(Location location) {}
 
-    public Location getLastLocation() {
-        return this.lastLocation;
+    public Location getLocation() {
+        return this.location;
+    }
+
+    public void setLocation(Location location) {
+        this.location = location;
     }
 }
